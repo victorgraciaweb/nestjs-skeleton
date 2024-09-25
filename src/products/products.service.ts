@@ -1,19 +1,22 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { ExceptionHandlerService } from 'src/common/services/exception-handler.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly exceptionHandlerService: ExceptionHandlerService
   ) { }
 
-  async create(createProductDto: CreateProductDto): Promise<CreateProductDto> {
+  async create(createProductDto: CreateProductDto): Promise<Product> {
     try {
       const product = this.productRepository.create(createProductDto);
       await this.productRepository.save(product);
@@ -21,7 +24,7 @@ export class ProductsService {
       return product;
 
     } catch (error) {
-      throw new BadRequestException(error.detail);
+      this.exceptionHandlerService.handleExceptions(error);
     }
   }
 

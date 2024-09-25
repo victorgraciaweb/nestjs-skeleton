@@ -1,4 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ExceptionHandlerService } from './services/exception-handler.service';
 
-@Module({})
-export class CommonModule {}
+@Module({
+    providers: [
+        ExceptionHandlerService,
+    ],
+    exports: [
+        ExceptionHandlerService,
+    ]
+})
+export class CommonModule { }
